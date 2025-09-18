@@ -70,4 +70,42 @@ public class PecasReposicaoDAO {
         }
         return lista;
     }
+    public boolean verificarEstoque (int idOrdem) throws SQLException{
+        String query = """
+                 SELECT p.id, p.estoque, op.quantidade
+                 FROM OrdemPeca op
+                 JOIN Peca p ON op.idPeca = p.id
+                 WHERE op.idOrdem = ?
+                """;
+
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, idOrdem);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()){
+                if(rs.getInt("estoque") < rs.getInt("quantidade")){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public void atualizarEstoque (int idOrdem) throws SQLException{
+        String query = """
+                UPDATE Peca p
+                                JOIN OrdemPeca op ON p.id = op.idPeca
+                                SET p.estoque = p.estoque - op.quantidade
+                                WHERE op.idOrdem = ?
+                """;
+
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, idOrdem);
+            stmt.executeUpdate();
+        }
+    }
+
 }

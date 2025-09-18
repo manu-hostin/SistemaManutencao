@@ -85,4 +85,14 @@ public class MaquinasDAO {
             stmt.executeUpdate();
         }
     }
+    public void atualizarStatusOperacional (int id) throws SQLException{
+        String query = "UPDATE Maquina SET status = 'OPERACIONAL' WHERE id = ?";
+
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+
+        }
+    }
 }

@@ -33,6 +33,9 @@ public class FluxoExecucao {
             case 5:
                 associarPecas();
                 break;
+            case 6:
+                executarManutencao();
+                break;
             case 0:
                 System.out.println("Saindo do sistema...");
                 break;
@@ -167,7 +170,7 @@ public class FluxoExecucao {
 
         try {
 
-            List<OrdemManutencao> ordensPendentes = dao.listarOrdens();
+            List<OrdemManutencao> ordensPendentes = dao.listarOrdensPendentes();
 
             if (ordensPendentes .isEmpty()) {
                 System.out.println("Não há ordens pendentes para associar peças.");
@@ -176,7 +179,7 @@ public class FluxoExecucao {
 
             System.out.println("=== ORDENS DISPNÍVEIS ===");
             for (int i = 0; i < ordensPendentes .size(); i++) {
-                OrdemManutencao o = ordensPendentes .get(i);
+                OrdemManutencao o = ordensPendentes.get(i);
                 System.out.println(i + " - Ordem ID: " + o.getCadastro() + " | Máquina: " + o.getId_maquina().getNome() + " | Técnico: "+o.getId_tecnico().getNome());
             }
 
@@ -210,4 +213,48 @@ public class FluxoExecucao {
             e.printStackTrace();
         }
     }
+    public static void executarManutencao (){
+        System.out.println("\n=== EXECUTAR MANUTENÇÃO ===");
+
+        OrdemManutencaoDAO dao = new OrdemManutencaoDAO();
+        PecasReposicaoDAO pecasDAO = new PecasReposicaoDAO();
+        MaquinasDAO maquinasDAO = new MaquinasDAO();
+
+        try{
+
+            List<OrdemManutencao> lista = dao.listarOrdensPendentes();
+            if (lista.isEmpty()){
+                System.out.println("Nenhuma ordem disponível!");
+            }
+
+            System.out.println("\n    ORDENS PENDENTES    ");
+            for (int i = 0; i < lista.size(); i++){
+                OrdemManutencao o = lista.get(i);
+                System.out.println("--------------------------------------------------");
+                System.out.println("ID: "+(o.getCadastro()-1)+ " |ID da Máquina: "+o.getId_maquina().getCadastro()+" |ID do Técnico: "+o.getId_tecnico().getCadastro()+"\nData de solicitação: "+o.getDataSolicitacao()+" |Status: "+o.getStatus());
+            }
+            System.out.println("");
+
+            int escolha = Interface.escolherOrdem();
+            OrdemManutencao ordemSelecionada = lista.get(escolha);
+
+            boolean estoqueSuficiente = pecasDAO.verificarEstoque(ordemSelecionada.getCadastro());
+
+            if (!estoqueSuficiente){
+                System.out.println("Estoque insuficiente!");
+                return;
+            }
+
+            pecasDAO.atualizarEstoque(ordemSelecionada.getCadastro());
+            dao.atualizarStatus(ordemSelecionada.getCadastro(),"EXECUTADA");
+            maquinasDAO.atualizarStatusOperacional(ordemSelecionada.getCadastro());
+
+            System.out.println("Manutenção realizada com sucesso!");
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+    }
+
 }
