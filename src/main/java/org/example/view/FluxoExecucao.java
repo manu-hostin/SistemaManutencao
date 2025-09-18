@@ -128,12 +128,18 @@ public class FluxoExecucao {
             }
             System.out.println("");
             int idMaq = Interface.escolherMaq();
+
+            if (idMaq < 0 || idMaq >= listaMaq.size()){
+                System.out.println("Opção inválida, tente novamente!");
+                return;
+            }
             Maquinas maqSelecionada = listaMaq.get(idMaq);
 
 
             TecnicosDAO tecDAO = new TecnicosDAO();
             List<Tecnicos> listaTec = tecDAO.listarTecnicos();
 
+            System.out.println("");
             for (int i = 0; i < listaTec.size(); i++){
                 Tecnicos t = listaTec.get(i);
                 System.out.println(i + " - " + t.getNome() + " | Especialidade: " + t.getEspecialidade());
@@ -141,6 +147,11 @@ public class FluxoExecucao {
 
             System.out.println("");
             int idTec = Interface.escolherTec();
+
+            if(idTec < 0 || idTec >= listaTec.size()){
+                System.out.println("Opção inválida, tente novamente!");
+                return;
+            }
             Tecnicos tecSelecionado = listaTec.get(idTec);
 
 
@@ -177,25 +188,40 @@ public class FluxoExecucao {
                 return;
             }
 
-            System.out.println("=== ORDENS DISPNÍVEIS ===");
-            for (int i = 0; i < ordensPendentes .size(); i++) {
+            System.out.println("\nORDENS DISPNÍVEIS -----");
+            for (int i = 0; i < ordensPendentes.size(); i++) {
                 OrdemManutencao o = ordensPendentes.get(i);
+
                 System.out.println(i + " - Ordem ID: " + o.getCadastro() + " | Máquina: " + o.getId_maquina().getNome() + " | Técnico: "+o.getId_tecnico().getNome());
+                System.out.println("");
             }
 
             int escolhaOrdem = Interface.escolherOrdem();
+
+            if(escolhaOrdem < 0 || escolhaOrdem >= ordensPendentes.size()){
+                System.out.println("Opção inválida, tente novamente!");
+                return;
+            }
             OrdemManutencao ordemSelecionada = ordensPendentes .get(escolhaOrdem);
 
 
             List<PecasReposicao> pecasDisponiveis = pecasDAO.listarPecas();
 
-            System.out.println("\n=== PEÇAS DISPONÍVEIS ===");
+            System.out.println("\nPEÇAS DISPONÍVEIS -----");
             for (int i = 0; i < pecasDisponiveis.size(); i++) {
                 PecasReposicao p = pecasDisponiveis.get(i);
+                System.out.println("");
                 System.out.println(i + " - " + p.getNome() + " | Estoque: " + p.getEstoque());
+                System.out.println("");
             }
 
             int escolhaPeca = Interface.escolherPeca();
+
+            if(escolhaPeca < 0 || escolhaPeca >= pecasDisponiveis.size()){
+                System.out.println("Escolha indisponível, tente novamente!");
+                return;
+            }
+
             PecasReposicao pecaEscolhida = pecasDisponiveis.get(escolhaPeca);
 
 
@@ -227,7 +253,7 @@ public class FluxoExecucao {
                 System.out.println("Nenhuma ordem disponível!");
             }
 
-            System.out.println("\n    ORDENS PENDENTES    ");
+            System.out.println("\nORDENS PENDENTES -----");
             for (int i = 0; i < lista.size(); i++){
                 OrdemManutencao o = lista.get(i);
                 System.out.println("--------------------------------------------------");
@@ -236,6 +262,12 @@ public class FluxoExecucao {
             System.out.println("");
 
             int escolha = Interface.escolherOrdem();
+
+            if (escolha < 0 || escolha >= lista.size()) {
+                System.out.println("Opção inválida, tente novamente!");
+                return;
+            }
+
             OrdemManutencao ordemSelecionada = lista.get(escolha);
 
             boolean estoqueSuficiente = pecasDAO.verificarEstoque(ordemSelecionada.getCadastro());
